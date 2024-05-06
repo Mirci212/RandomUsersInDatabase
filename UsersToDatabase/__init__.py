@@ -7,9 +7,9 @@ class GenerateUsersInTable:
     def __init__(self, host: str, user: str, password: str,  database: str):
         self.adapter = MySqlDatAdapter(host,user,password,database)
 
-    def writeUsersInTable(self,datatable: str):
+    def writeUsersInTable(self,datatable: str,count: int):
         sql = f'INSERT INTO {datatable} (firstName,lastName,email,country,plz,city,street,streetNum,birth) VALUES '
-        users = UserList.createUsersRandom(2000)
+        users = UserList.createUsersRandom(count)
         for user in users:
             country = self.adapter.SelectSQL(f'SELECT Land_kurz FROM countries WHERE Name=\'{user.country}\'')[0][0]
             currsql = sql + user.generateSQLInsertWithoutCountry().format(country) + ';'
