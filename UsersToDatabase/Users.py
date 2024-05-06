@@ -56,8 +56,11 @@ class UserList:
         self.userlist.append(user)
         return True
 
-    def removeUser(self, pos: int) -> User:
+    def removeUserPos(self, pos: int) -> User:
         return self.userlist.pop(pos)
+
+    def removeUser(self, user: User):
+        self.userlist.remove(user)
 
     @staticmethod
     def createUsersRandom(count: int) -> 'UserList':

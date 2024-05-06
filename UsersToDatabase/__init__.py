@@ -1,5 +1,5 @@
-from DataAdapter import *
-from Users import *
+from UsersToDatabase.DataAdapter import *
+from UsersToDatabase.Users import *
 
 class GenerateUsersInTable:
     adapter: MySqlDatAdapter
@@ -9,13 +9,14 @@ class GenerateUsersInTable:
 
     def writeUsersInTable(self,datatable: str):
         sql = f'INSERT INTO {datatable} (firstName,lastName,email,country,plz,city,street,streetNum,birth) VALUES '
-        users = UserList.createUsersRandom(50)
+        users = UserList.createUsersRandom(2000)
         for user in users:
             country = self.adapter.SelectSQL(f'SELECT Land_kurz FROM countries WHERE Name=\'{user.country}\'')[0][0]
-            sql += user.generateSQLInsertWithoutCountry().format(country) + ','
-        sql = sql[:-1] + ";"
-        self.adapter.NonQuerySQL(sql)
-        print()
+            currsql = sql + user.generateSQLInsertWithoutCountry().format(country) + ';'
+            try:
+                self.adapter.NonQuerySQL(currsql)
+            except:
+                users.removeUser(user)
+        print("Wrote all users in sql finished!")
 
-load_dotenv("../environment.env")
-GenerateUsersInTable(os.getenv("HOST"),os.getenv("USER"),os.getenv("PASSWORD"), os.getenv("DATABASE")).writeUsersInTable("test_user")
+
