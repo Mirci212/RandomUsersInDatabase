@@ -14,7 +14,7 @@ class MySqlDatAdapter:
             'raise_on_warnings': True
         }
         self.TryConnect()
-        self.conn.close()
+
     def SelectSQL(self, sql: str):
         try:
             cursor = self.conn.cursor()
@@ -43,7 +43,3 @@ class MySqlDatAdapter:
         except:
             print("Connection failed")
             raise ConnectionError("Connection failed!")
-
-
-load_dotenv("../environment.env")
-MySqlDatAdapter(os.getenv("HOST"), os.getenv("USER"), os.getenv("PASSWORD"), os.getenv("DATABASE"))

@@ -2,6 +2,7 @@ import requests
 
 randomUserApi: str = "https://randomuser.me/api/?results={}"
 
+
 class User:
     firstname: str
     lastname: str
@@ -38,9 +39,11 @@ class User:
                     userDict["location"]["street"]["number"], userDict["location"]["country"],
                     userDict["location"]["city"], userDict["dob"]["date"])
 
+    def generateSQLInsertWithoutCountry(self):
+        return f'(\'{self.firstname}\',\'{self.lastname}\',\'{self.email}\',\'{"{}"}\',\'{self.plz}\',\'{self.city}\',\'{self.street}\',{self.streetNum},\'{self.birthday.split("T")[0]}\')'
+
 
 class UserList:
-
     userlist: list[User]
 
     def __init__(self, userlist: list[User] = None):
@@ -55,6 +58,7 @@ class UserList:
 
     def removeUser(self, pos: int) -> User:
         return self.userlist.pop(pos)
+
     @staticmethod
     def createUsersRandom(count: int) -> 'UserList':
         apiResult: list = requests.get(randomUserApi.format(count)).json()["results"]
@@ -62,6 +66,7 @@ class UserList:
         for res in apiResult:
             result.addUser(User.CreateUserFromDictAPI(res))
         return result
+
     def removeUserWithUserName(self, FullName: str) -> User or None:
         for user in self.userlist:
             if user.FullName == FullName:
@@ -71,3 +76,6 @@ class UserList:
 
     def __getitem__(self, item):
         return self.userlist[item]
+
+    def __iter__(self):
+        return iter(self.userlist)
