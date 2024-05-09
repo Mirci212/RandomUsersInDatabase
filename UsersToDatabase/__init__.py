@@ -11,12 +11,13 @@ class GenerateUsersInTable:
         sql = f'INSERT INTO {datatable} (firstName,lastName,email,country,plz,city,street,streetNum,birth) VALUES '
         users = UserList.createUsersRandom(count)
         for user in users:
-            country = self.adapter.SelectSQL(f'SELECT Land_kurz FROM countries WHERE Name=\'{user.country}\'')[0][0]
+            country = self.adapter.SelectSQL(f'SELECT Land_kurz FROM countries WHERE en=\'{user.country}\'')[0][0]
             currsql = sql + user.generateSQLInsertWithoutCountry().format(country) + ';'
             try:
                 self.adapter.NonQuerySQL(currsql)
             except:
                 users.removeUser(user)
+                users.createUsersAPI()
         print("Wrote all users in sql finished!")
 
 

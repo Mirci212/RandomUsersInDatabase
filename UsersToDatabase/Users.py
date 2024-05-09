@@ -62,6 +62,12 @@ class UserList:
     def removeUser(self, user: User):
         self.userlist.remove(user)
 
+    def createUsersAPI(self,count: int = 1) -> bool:
+        apiResult: list = requests.get(randomUserApi.format(count)).json()["results"]
+        for res in apiResult:
+            self.addUser(User.CreateUserFromDictAPI(res))
+        return True
+
     @staticmethod
     def createUsersRandom(count: int) -> 'UserList':
         apiResult: list = requests.get(randomUserApi.format(count)).json()["results"]
