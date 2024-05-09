@@ -30,7 +30,7 @@ class MySqlDatAdapter:
             cursor = self.conn.cursor()
             cursor.execute(sql)
             self.conn.commit()
-            print("SQL statement executed successfully")
+            print(f'SQL statement executed successfully: {sql}')
         except Exception as e:
             print("Error executing SQL statement:", e)
             self.conn.rollback()
