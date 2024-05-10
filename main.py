@@ -1,4 +1,4 @@
 from UsersToDatabase import *
 
 load_dotenv("environment.env")
-GenerateUsersInTable(os.getenv("HOST"),os.getenv("USER"),os.getenv("PASSWORD"), os.getenv("DATABASE")).writeUsersInTable("test_user",2000)
+GenerateUsersInTable(os.getenv("HOST"),os.getenv("USER"),os.getenv("PASSWORD"), os.getenv("DATABASE")).writeUsersInTable("test_user",200_000)

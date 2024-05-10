@@ -8,16 +8,13 @@ class GenerateUsersInTable:
         self.adapter = MySqlDatAdapter(host,user,password,database)
 
     def writeUsersInTable(self,datatable: str,count: int):
-        sql = f'INSERT INTO {datatable} (firstName,lastName,email,country,plz,city,street,streetNum,birth) VALUES '
+        sql = f'INSERT IGNORE INTO {datatable} (firstName,lastName,email,country,plz,city,street,streetNum,birth) ' \
+              f'VALUES (%s, %s, %s, (SELECT Land_Kurz FROM countries WHERE en=%s), %s, %s, %s, %s, %s)'
         users = UserList.createUsersRandom(count)
-        for user in users:
-            country = self.adapter.SelectSQL(f'SELECT Land_kurz FROM countries WHERE en=\'{user.country}\'')[0][0]
-            currsql = sql + user.generateSQLInsertWithoutCountry().format(country) + ';'
-            try:
-                self.adapter.NonQuerySQL(currsql)
-            except:
-                users.removeUser(user)
-                users.createUsersAPI()
+        data = [user.generateDataForSQL() for user in users]
+
+        self.adapter.NonQuerySQLMany(sql,data)
+
         print("Wrote all users in sql finished!")
 
 

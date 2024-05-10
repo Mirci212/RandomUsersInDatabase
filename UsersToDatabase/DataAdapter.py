@@ -25,16 +25,14 @@ class MySqlDatAdapter:
             print("Error executing SQL query:", e)
             raise
 
-    def NonQuerySQL(self, sql: str):
+    def NonQuerySQLMany(self, sql: str, data: list):
         try:
             cursor = self.conn.cursor()
-            cursor.execute(sql)
-            self.conn.commit()
+            cursor.executemany(sql,data)
             print(f'SQL statement executed successfully: {sql}')
         except Exception as e:
             print("Error executing SQL statement:", e)
-            self.conn.rollback()
-            raise
+        self.conn.commit()
 
     def TryConnect(self):
         try:

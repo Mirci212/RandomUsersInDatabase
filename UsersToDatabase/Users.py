@@ -1,6 +1,13 @@
+import time
+
 import requests
+import math
 
 randomUserApi: str = "https://randomuser.me/api/?results={}"
+apiLimitPerRequest: int = 5_000
+RequestsPerMinute: int = 4
+
+
 
 
 class User:
@@ -39,8 +46,9 @@ class User:
                     userDict["location"]["street"]["number"], userDict["location"]["country"],
                     userDict["location"]["city"], userDict["dob"]["date"])
 
-    def generateSQLInsertWithoutCountry(self):
-        return f'(\'{self.firstname}\',\'{self.lastname}\',\'{self.email}\',\'{"{}"}\',\'{self.plz}\',\'{self.city}\',\'{self.street}\',{self.streetNum},\'{self.birthday.split("T")[0]}\')'
+    def generateDataForSQL(self):
+        country_sql = f"(SELECT LEFT(Land_Kurz, 2) FROM countries WHERE en='{self.country}')"
+        return (self.firstname,self.lastname,self.email,self.country,self.plz,self.city,self.street,self.streetNum,self.birthday.split("T")[0])
 
 
 class UserList:
@@ -51,6 +59,7 @@ class UserList:
             self.userlist = userlist
         else:
             self.userlist = []
+
 
     def addUser(self, user: User) -> bool:
         self.userlist.append(user)
@@ -70,10 +79,23 @@ class UserList:
 
     @staticmethod
     def createUsersRandom(count: int) -> 'UserList':
-        apiResult: list = requests.get(randomUserApi.format(count)).json()["results"]
         result: UserList = UserList()
-        for res in apiResult:
-            result.addUser(User.CreateUserFromDictAPI(res))
+        requestmax = math.ceil(count / apiLimitPerRequest)
+        for i in range(requestmax):
+            print(f'RequestCountAPI: {(i+1)} / {requestmax}')
+            if (i+1) % RequestsPerMinute == 0:
+                time.sleep(300)
+
+            if i == requestmax - 1:
+                requestCount = count % apiLimitPerRequest
+                if requestCount == 0: continue
+                apiResult: list = requests.get(randomUserApi.format(requestCount)).json()["results"]
+            else:
+                apiResult: list = requests.get(randomUserApi.format(apiLimitPerRequest)).json()["results"]
+
+            for res in apiResult:
+                result.addUser(User.CreateUserFromDictAPI(res))
+
         return result
 
     def removeUserWithUserName(self, FullName: str) -> User or None:
